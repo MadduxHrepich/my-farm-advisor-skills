@@ -62,8 +62,12 @@ silently produce nothing.
 ## What is in the map
 
 - **Esri World Imagery** basemap with an optional place-labels overlay and an
-  OpenStreetMap fallback, switchable in the layer control. Tiles and Leaflet
-  1.9.4 load from CDNs, so the viewer needs internet access.
+  **Esri World Street Map** alternative, switchable in the layer control. The
+  reference labels overlay is auto-hidden on the street basemap, which already
+  labels its own features. Both basemaps are keyless Esri services;
+  OpenStreetMap public tiles are deliberately not used because they reject
+  referer-less requests from local `file://` pages. Tiles and Leaflet 1.9.4 load
+  from CDNs, so the viewer needs internet access.
 - **Field boundaries** for every farm of the grower, coloured by crop, with a
   crisp outline layer above the soil fill.
 - **Field popup**: grower, farm, field name, crop, acres, county, state, boundary

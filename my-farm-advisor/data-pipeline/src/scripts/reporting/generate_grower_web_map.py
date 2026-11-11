@@ -54,7 +54,12 @@ ESRI_LABELS_URL = (
     "https://server.arcgisonline.com/ArcGIS/rest/services/Reference"
     "/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
 )
-OSM_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+# OSM public tiles now reject referer-less requests from local file:// pages,
+# so the street basemap stays on the same keyless Esri service as the imagery.
+ESRI_STREET_URL = (
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map"
+    "/MapServer/tile/{z}/{y}/{x}"
+)
 
 FIELD_COLORS = {
     "corn": "#d97706",
@@ -506,9 +511,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   }).addTo(map);
 
   const labels = L.tileLayer("%%ESRI_LABELS%%", {maxZoom: 19, opacity: 0.9});
-  const osm = L.tileLayer("%%OSM%%", {
+  const street = L.tileLayer("%%ESRI_STREET%%", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: 'Basemap &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'
   });
 
   function esc(value) {
@@ -627,7 +632,41 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   if (DATA.soil.features.length) {
     overlays["SSURGO soil map units (drainage)"] = soilLayer;
   }
-  L.control.layers({"ESRI World Imagery": imagery, "OpenStreetMap": osm}, overlays, {collapsed: false}).addTo(map);
+  L.control.layers({"ESRI World Imagery": imagery, "Esri World Street Map": street}, overlays, {collapsed: false}).addTo(map);
+
+  // The Esri reference labels are drawn for imagery; the street basemap already
+  // carries its own labels, so hide the overlay there and restore it on imagery.
+  let placeLabelsWanted = true;
+  let suppressLabelTracking = false;
+  function setOverlayCheckbox(name, checked) {
+    document.querySelectorAll(".leaflet-control-layers-overlays label").forEach(function (label) {
+      if (label.textContent.trim() === name) { label.querySelector("input").checked = checked; }
+    });
+  }
+  map.on("overlayadd", function (e) {
+    if (!suppressLabelTracking && e.layer === labels) { placeLabelsWanted = true; }
+  });
+  map.on("overlayremove", function (e) {
+    if (!suppressLabelTracking && e.layer === labels) { placeLabelsWanted = false; }
+  });
+  map.on("baselayerchange", function (e) {
+    if (e.layer === street) {
+      if (map.hasLayer(labels)) {
+        suppressLabelTracking = true;
+        map.removeLayer(labels);
+        suppressLabelTracking = false;
+        placeLabelsWanted = true;
+        setOverlayCheckbox("Place labels", false);
+      }
+    } else if (e.layer === imagery && placeLabelsWanted) {
+      if (!map.hasLayer(labels)) {
+        suppressLabelTracking = true;
+        labels.addTo(map);
+        suppressLabelTracking = false;
+      }
+      setOverlayCheckbox("Place labels", true);
+    }
+  });
 
   const allBounds = fieldLayer.getBounds();
   map.fitBounds(allBounds, {padding: [30, 30]});
@@ -712,7 +751,7 @@ def _render_html(payload: dict[str, Any], title: str) -> str:
         .replace("%%DATA%%", _json_blob(payload))
         .replace("%%ESRI_IMAGERY%%", ESRI_IMAGERY_URL)
         .replace("%%ESRI_LABELS%%", ESRI_LABELS_URL)
-        .replace("%%OSM%%", OSM_URL)
+        .replace("%%ESRI_STREET%%", ESRI_STREET_URL)
     )
 
 
@@ -782,7 +821,7 @@ def main() -> int:
             "soil_unit_count": stats["soil_unit_count"],
             "fields_with_soil": stats["fields_with_soil"],
             "soil_simplify_tolerance_deg": stats["soil_tolerance_deg"],
-            "basemaps": {"primary": ESRI_IMAGERY_URL, "labels": ESRI_LABELS_URL, "fallback": OSM_URL},
+            "basemaps": {"primary": ESRI_IMAGERY_URL, "labels": ESRI_LABELS_URL, "street": ESRI_STREET_URL},
             "sources": {
                 "fields": [
                     str(farm_boundary_path(grower_slug, farm["slug"])) for farm in payload["farms"]
