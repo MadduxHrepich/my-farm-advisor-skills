@@ -281,6 +281,10 @@ The umbrella entrypoint is [`SKILL.md`](SKILL.md). From there, the skill routes 
 | Strategy         | Crop strategy and maturity planning workflows                          | [`strategy/INDEX.md`](strategy/INDEX.md)                 |
 | Weather          | NASA POWER weather ingestion and downstream weather analysis           | [`weather/INDEX.md`](weather/INDEX.md)                   |
 
+The field-level EDA workflow has a committed example report at
+[`eda/field-eda/examples/analysis-report/output/field_eda_report.md`](eda/field-eda/examples/analysis-report/output/field_eda_report.md);
+it compares boundaries, CDL rotation, and growing-season weather across the three growers.
+
 ## Typical Workflow
 
 ```mermaid

@@ -1,0 +1,4 @@
+grower,state,county,fields,acres_total,acres_median,acres_min,acres_max,compactness_median,cdl_area_dev_median_pct,rotation_start_year,rotation_end_year,alternation_rate_mean,fields_with_continuous_corn,crop_share_mean_pct,corn_share_mean_pct,soybean_share_mean_pct,noncrop_share_mean_pct,weather_cells,precip_mm,precip_min_mm,precip_max_mm,gdd_c,gdd_min_c,gdd_max_c,heat_days_35c
+Iowa,IA,Kossuth,10,6409.2264,599.9336,554.2513,873.0387,0.3637,0.3114,2021,2025,0.9750,1,99.2851,47.1243,51.5804,0.7164,3,495.3542,322.9702,692.8700,1670.6537,1507.0752,1825.6300,5.4000
+Illinois,IL,Iroquois,10,6444.2712,605.7672,540.6591,956.9090,0.3238,0.1100,2021,2025,0.9000,1,99.3569,56.7437,41.4590,0.6397,4,449.5557,376.9404,567.1199,1767.2285,1718.6899,1819.2550,1.0500
+Nebraska,NE,York,10,5019.7458,513.5948,455.3206,548.0047,0.3542,0.0136,2021,2025,0.5750,6,99.1180,67.9551,30.5917,0.8824,3,402.5249,319.7803,557.2602,2002.8386,1873.5751,2116.7900,21.9333

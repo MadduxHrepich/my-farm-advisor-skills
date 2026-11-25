@@ -10,19 +10,104 @@ import pandas as pd
 import rasterio
 from rasterstats import zonal_stats
 
+# USDA NASS Cropland Data Layer class legend.
+# Source: NASS CDL metadata, "Raster Attribute Domain Values and Definitions"
+# (https://www.nass.usda.gov/Research_and_Science/Cropland/metadata/meta.php).
+# Keep this complete rather than a hand-picked subset: dropping unmapped codes
+# silently removes whole categories from the composition and mislabels the rest.
 CDL_CODES = {
-    0: "No Data",
+    0: "Background",
     1: "Corn",
+    2: "Cotton",
+    3: "Rice",
+    4: "Sorghum",
     5: "Soybeans",
+    6: "Sunflower",
+    10: "Peanuts",
+    11: "Tobacco",
+    12: "Sweet Corn",
+    13: "Pop or Orn Corn",
+    14: "Mint",
+    21: "Barley",
+    22: "Durum Wheat",
+    23: "Spring Wheat",
     24: "Winter Wheat",
-    28: "Alfalfa",
-    36: "Forest",
-    38: "Grassland",
-    43: "Open Water",
-    61: "Fallow/Idle",
-    63: "Other",
+    25: "Other Small Grains",
+    26: "Dbl Crop WinWht/Soybeans",
+    27: "Rye",
+    28: "Oats",
+    29: "Millet",
+    30: "Speltz",
+    31: "Canola",
+    32: "Flaxseed",
+    33: "Safflower",
+    34: "Rape Seed",
+    35: "Mustard",
+    36: "Alfalfa",
+    37: "Other Hay/Non Alfalfa",
+    38: "Camelina",
+    39: "Buckwheat",
+    41: "Sugarbeets",
+    42: "Dry Beans",
+    43: "Potatoes",
+    44: "Other Crops",
+    45: "Sugarcane",
+    46: "Sweet Potatoes",
+    47: "Misc Vegs & Fruits",
+    48: "Watermelons",
+    49: "Onions",
+    50: "Cucumbers",
+    51: "Chick Peas",
+    52: "Lentils",
+    53: "Peas",
+    54: "Tomatoes",
+    55: "Caneberries",
+    56: "Hops",
+    57: "Herbs",
+    58: "Clover/Wildflowers",
+    59: "Sod/Grass Seed",
+    60: "Switchgrass",
+    61: "Fallow/Idle Cropland",
+    62: "Pasture/Grass",
+    63: "Forest",
+    64: "Shrubland",
+    65: "Barren",
+    66: "Cherries",
+    67: "Peaches",
+    68: "Apples",
+    69: "Grapes",
+    70: "Christmas Trees",
+    71: "Other Tree Crops",
+    72: "Citrus",
+    74: "Pecans",
+    75: "Almonds",
+    76: "Walnuts",
+    77: "Pears",
+    81: "Clouds/No Data",
+    82: "Developed",
+    83: "Water",
+    87: "Wetlands",
+    88: "Nonag/Undefined",
+    92: "Aquaculture",
+    111: "Open Water",
+    112: "Perennial Ice/Snow",
+    121: "Developed/Open Space",
+    122: "Developed/Low Intensity",
+    123: "Developed/Med Intensity",
+    124: "Developed/High Intensity",
+    131: "Barren",
+    141: "Deciduous Forest",
+    142: "Evergreen Forest",
+    143: "Mixed Forest",
+    152: "Shrubland",
     176: "Grass/Pasture",
+    190: "Woody Wetlands",
+    195: "Herbaceous Wetlands",
 }
+
+# Classes that are absence-of-observation rather than land cover. These are
+# removed from compositions so percentages are not quietly diluted by them.
+_CDL_NODATA_NAMES = {"Background", "No Data", "Clouds/No Data"}
 
 
 def filter_cdl_categories(crop_mix: pd.DataFrame) -> pd.DataFrame:
@@ -32,7 +117,10 @@ def filter_cdl_categories(crop_mix: pd.DataFrame) -> pd.DataFrame:
     if "crop_name" not in df.columns:
         return df
     crop_names = pd.Series(df["crop_name"], dtype="object").fillna("").astype(str).str.strip()
-    valid_mask = ~crop_names.eq("No Data") & ~crop_names.str.startswith("Code_")
+    valid_mask = (
+        ~crop_names.isin(_CDL_NODATA_NAMES)
+        & ~crop_names.str.startswith("Code_")
+    )
     return df.loc[valid_mask].copy()
 
 

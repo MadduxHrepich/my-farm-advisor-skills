@@ -1,0 +1,19 @@
+metric,definition,grower,state,value,rank_low_to_high
+precip,May-Sep (primary),Illinois,IL,449.5557,2
+precip,May-Sep (primary),Iowa,IA,495.3542,3
+precip,May-Sep (primary),Nebraska,NE,402.5249,1
+precip,Apr-Oct,Illinois,IL,622.5863,2
+precip,Apr-Oct,Iowa,IA,625.3117,3
+precip,Apr-Oct,Nebraska,NE,478.5583,1
+precip,Calendar year,Illinois,IL,914.7035,3
+precip,Calendar year,Iowa,IA,786.5493,2
+precip,Calendar year,Nebraska,NE,608.2845,1
+gdd,May-Sep capped (primary),Illinois,IL,1767.2285,2
+gdd,May-Sep capped (primary),Iowa,IA,1670.6537,1
+gdd,May-Sep capped (primary),Nebraska,NE,2002.8386,3
+gdd,Apr-Oct capped,Illinois,IL,1983.4045,2
+gdd,Apr-Oct capped,Iowa,IA,1826.6993,1
+gdd,Apr-Oct capped,Nebraska,NE,2246.2013,3
+gdd,May-Sep uncapped,Illinois,IL,1767.3443,2
+gdd,May-Sep uncapped,Iowa,IA,1671.6727,1
+gdd,May-Sep uncapped,Nebraska,NE,2014.8420,3
