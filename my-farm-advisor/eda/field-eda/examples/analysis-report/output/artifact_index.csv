@@ -1,0 +1,19 @@
+kind,id,category,level,file,job
+figure,B1,Boundaries,across fields / map,figures/b1_field_map_and_acreage.png,"Static geospatial map by grower, plus the acreage distribution behind it."
+figure,B2,Boundaries,across fields,figures/b2_area_vs_compactness.png,Correlation between field size and compactness within each grower.
+figure,B3,Boundaries,comparison,figures/b3_polygon_vs_cdl_area.png,"Polygon area versus CDL pixel area, the composition denominator check."
+figure,C1,CDL,within field / field-year,figures/c1_crop_sequence_heatmap.png,Observed crop sequence per field and the rotation archetypes.
+figure,C2,CDL,grower / across growers,figures/c2_crop_mix_by_grower_year.png,Crop mix by grower-year and whether rotations are synchronized.
+figure,C3,CDL,comparison,figures/c3_transition_matrix.png,"Observed crop transitions, the rotation-discipline comparison."
+figure,W1,Weather,within field / field-year,figures/w1_within_field_precip_anomaly.png,Each field-year's wet/dry position relative to that field's own mean.
+figure,W2,Weather,grower / across growers,figures/w2_climate_space.png,Grower climate space at the honest cell-year unit.
+figure,W3,Weather,within field / across growers,figures/w3_crop_weather_exposure.png,"Corn versus soybean exposure, and whether location separates them."
+table,,Boundaries,,tables/field_summary.csv,"Field geometry, acreage, compactness, CDL area check."
+table,,CDL,,tables/cdl_field_year.csv,Crop-group shares and dominant crop per field-year.
+table,,CDL,,tables/rotation_summary.csv,"Sequence, transitions, change rate, diversity."
+table,,Weather,,tables/weather_field_year.csv,Primary season and sensitivity columns per field-year.
+table,,Weather,,tables/weather_cell_year.csv,De-duplicated weather per grid cell-year.
+table,,Weather,,tables/crop_weather.csv,Field-year weather joined to the CDL dominant crop.
+table,,Weather,,tables/weather_qc.csv,Per field-year completeness and range checks.
+table,,Weather,,tables/weather_sensitivity.csv,Alternate season and GDD definitions with ranks.
+table,,All,,tables/grower_profile.csv,One row per grower; the report handoff table.

@@ -35,7 +35,7 @@ ensure_skill_path("cdl-cropland")
 from aci_reporting import ACI_MIN_YEAR, extract_aci_crop_composition
 from cdl_reporting import extract_crop_composition, summarize_crop_history
 
-DEFAULT_CDL_LATEST_YEAR = 2023  # 2026 program data rule: external data must be public by 2026-02-01 (CDL 2024+ publishes later)
+DEFAULT_CDL_LATEST_YEAR = 2025  # CDL 2025 published 2026-03; satisfies the 2026-02-01 public-data rule
 DEFAULT_CDL_WINDOW_YEARS = 5
 
 
@@ -207,6 +207,24 @@ def _table_field_ids(csv_path: Path) -> set[str]:
     return set(frame["field_id"].astype(str).tolist())
 
 
+def _composition_covers_years(composition_path: Path, years: list[int]) -> bool:
+    """True when some farm composition file spans every year in ``years``."""
+    if not years or not composition_path.parent.exists():
+        return False
+    low, high = min(years), max(years)
+    for path in composition_path.parent.glob("*_cdl_*_full_composition.csv"):
+        parts = path.stem.split("_")
+        if len(parts) < 4:
+            continue
+        try:
+            start, end = int(parts[-4]), int(parts[-3])
+        except ValueError:
+            continue
+        if start <= low and end >= high:
+            return True
+    return False
+
+
 def main():
     args = parse_args()
     if args.raster_only:
@@ -259,7 +277,15 @@ def main():
     if not us_fields.empty:
         print("State CDL coverage:", ", ".join(state_fips_values))
 
-    target_years = _target_cdl_years()
+    explicit_years = _parse_years(args.cdl_years)
+    target_years = explicit_years or _target_cdl_years(
+        window_years=args.cdl_window_years,
+        latest_year=args.cdl_latest_year,
+    )
+    # The default candidate list runs back further than the requested window so
+    # missing latest years can fall back to older rasters. Only the newest
+    # `window_years` of them count as the default request.
+    required_years = explicit_years or target_years[: args.cdl_window_years]
     cached_years = [
         year
         for year in target_years
@@ -267,17 +293,17 @@ def main():
     ]
     if (
         not force
-        and len(cached_years) >= 5
+        and len(cached_years) >= len(required_years)
         and farm_cdl_rotation_path(grower_slug, farm_slug).exists()
     ):
-        selected_years = sorted(cached_years[:5], reverse=True)
+        selected_years = sorted(cached_years[: len(required_years)], reverse=True)
         composition_path = farm_cdl_full_composition_path(
             grower_slug,
             farm_slug,
             min(selected_years),
             max(selected_years),
         )
-        if composition_path.exists():
+        if _composition_covers_years(composition_path, selected_years):
             expected_field_ids = set(fields["field_id"].astype(str).tolist())
             missing_by_year: dict[int, list[str]] = {}
             for year in selected_years:
@@ -351,7 +377,7 @@ def main():
         print(f"  Saved: {year_output}")
         crop_mix_frames.append(cdl_year)
         completed_years.append(year)
-        if len(completed_years) >= 5:
+        if explicit_years is None and len(completed_years) >= args.cdl_window_years:
             break
 
     if not crop_mix_frames:

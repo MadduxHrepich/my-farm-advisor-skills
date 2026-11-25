@@ -1,0 +1,485 @@
+{
+  "tool": "field-eda",
+  "format_version": 1,
+  "generated_at_utc": "2026-11-25T01:00:34+00:00",
+  "command": "python run_field_eda.py --category all --out $DATA_PIPELINE_DATA_ROOT/data-pipeline/eda/field-eda",
+  "data_root": "$DATA_PIPELINE_DATA_ROOT",
+  "output_dir": "$DATA_PIPELINE_DATA_ROOT/data-pipeline/eda/field-eda",
+  "category": "all",
+  "definitions": {
+    "season_start": "05-01",
+    "season_end": "09-30",
+    "sensitivity_season": "04-01 to 10-31",
+    "gdd_base_c": 10.0,
+    "gdd_cap_c": 30.0,
+    "gdd_uncapped_sensitivity": true,
+    "heat_day_threshold_c": 35.0,
+    "rain_day_mm": 1.0,
+    "heavy_rain_day_mm": 25.0,
+    "grower_weather_weighting": "cell-weighted",
+    "crop_weather_crops": [
+      "Corn",
+      "Soybeans"
+    ],
+    "crop_weather_window": "primary season, May-Sep",
+    "crop_weather_pairing": "per field, mean by crop, corn minus soybean",
+    "cdl_years": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "rotation_start_year": 2021
+  },
+  "inputs": {
+    "growers": [
+      "iowa-grower",
+      "illinois-grower",
+      "nebraska-grower"
+    ],
+    "farms": [
+      "iowa-farm",
+      "illinois-farm",
+      "nebraska-farm"
+    ],
+    "fields": 30,
+    "weather_tables": [
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_weather_2021_2025.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_weather_2021_2025.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_weather_2021_2025.csv"
+    ],
+    "weather_cells": 10,
+    "cdl_tables": [
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2019_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2020_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2021_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2022_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2023_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2024_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/iowa-grower/farms/iowa-farm/derived/tables/iowa_2025_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2019_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2020_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2021_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2022_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2023_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2024_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/illinois-grower/farms/illinois-farm/derived/tables/illinois_2025_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2019_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2020_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2021_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2022_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2023_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2024_cdl.csv",
+      "$DATA_PIPELINE_DATA_ROOT/data-pipeline/growers/nebraska-grower/farms/nebraska-farm/derived/tables/nebraska_2025_cdl.csv"
+    ]
+  },
+  "counts": {
+    "fields": 30,
+    "field_years": 150,
+    "weather_cells": 10,
+    "cell_years": 50,
+    "weather_years": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "sensitivity_stable": {
+      "precip": {
+        "orderings": [
+          [
+            "Nebraska",
+            "Illinois",
+            "Iowa"
+          ],
+          [
+            "Nebraska",
+            "Illinois",
+            "Iowa"
+          ],
+          [
+            "Nebraska",
+            "Iowa",
+            "Illinois"
+          ]
+        ],
+        "stable": false
+      },
+      "gdd": {
+        "orderings": [
+          [
+            "Iowa",
+            "Illinois",
+            "Nebraska"
+          ],
+          [
+            "Iowa",
+            "Illinois",
+            "Nebraska"
+          ],
+          [
+            "Iowa",
+            "Illinois",
+            "Nebraska"
+          ]
+        ],
+        "stable": true
+      }
+    },
+    "crop_weather_field_years": 150,
+    "corn_field_years": 87,
+    "soybean_field_years": 63,
+    "paired_crop_fields": 26,
+    "paired_crop_fields_by_state": {
+      "IA": 10,
+      "IL": 9,
+      "NE": 7
+    },
+    "boundary_fields": 30,
+    "boundary_acres_median": 572.72,
+    "cdl_field_years": 210,
+    "cdl_years": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "rotation_start_year": 2021,
+    "rotation_alternation_mean": 0.817,
+    "fields_with_continuous_corn": 8
+  },
+  "qc": {
+    "status": "pass",
+    "checks": [
+      {
+        "name": "weather fields match boundaries",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "one row per field-date",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "no nulls in core variables",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "no sentinel values <= -900",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "T2M within [T2M_MIN, T2M_MAX]",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "precip/solar/wind non-negative",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "RH2M within 0-100",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "one sample coordinate per field",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "one weather cell per field",
+        "status": "pass",
+        "expected": "30",
+        "observed": "1"
+      },
+      {
+        "name": "one daily series per cell",
+        "status": "pass",
+        "expected": "1",
+        "observed": "1",
+        "detail": "30 fields map to 10 cells"
+      },
+      {
+        "name": "cell count equals distinct daily series",
+        "status": "pass",
+        "expected": "10",
+        "observed": "10"
+      },
+      {
+        "name": "continuous daily coverage per field",
+        "status": "pass",
+        "expected": "1826",
+        "observed": "1826-1826 days"
+      },
+      {
+        "name": "leap day present when in window",
+        "status": "pass",
+        "expected": "1 leap day(s)",
+        "observed": "all present"
+      },
+      {
+        "name": "weather years complete",
+        "status": "pass",
+        "expected": "[2021, 2022, 2023, 2024, 2025]",
+        "observed": "[2021, 2022, 2023, 2024, 2025]"
+      },
+      {
+        "name": "primary-season days complete",
+        "status": "pass",
+        "expected": "all field-years",
+        "observed": "153-153 days"
+      },
+      {
+        "name": "field-year QC rows pass",
+        "status": "pass",
+        "expected": "150",
+        "observed": "150"
+      },
+      {
+        "name": "every field has every CDL year",
+        "status": "pass",
+        "expected": "30 fields x 7 years",
+        "observed": "{2019: 30, 2020: 30, 2021: 30, 2022: 30, 2023: 30, 2024: 30, 2025: 30}"
+      },
+      {
+        "name": "CDL shares sum to 100",
+        "status": "pass",
+        "expected": "99.5-100.5%",
+        "observed": "99.97-100.02%"
+      },
+      {
+        "name": "no unmapped Code_* labels",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "CDL codes are known land-cover classes",
+        "status": "pass",
+        "expected": "all known",
+        "observed": "all known"
+      },
+      {
+        "name": "dominant class is a crop group",
+        "status": "pass",
+        "expected": "no Non-crop dominant",
+        "observed": "none"
+      },
+      {
+        "name": "CDL pixel total stable across years",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      },
+      {
+        "name": "CDL 2023 majority matches CSB crop attribute",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30",
+        "detail": "Consistency check only: the CSB crop attribute is CDL-derived, not independent."
+      },
+      {
+        "name": "rotation rows match field count",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "crop-weather join complete",
+        "status": "pass",
+        "expected": "150",
+        "observed": "150",
+        "detail": "Every weather field-year must carry a CDL crop label."
+      },
+      {
+        "name": "crop labels are corn or soybean",
+        "status": "pass",
+        "expected": "Corn, Soybeans",
+        "observed": "Corn, Soybeans"
+      },
+      {
+        "name": "paired crop fields exist",
+        "status": "pass",
+        "expected": "> 0",
+        "observed": "26",
+        "detail": "At least one field must have grown both crops."
+      },
+      {
+        "name": "every grower has a paired field",
+        "status": "pass",
+        "expected": "3",
+        "observed": "3"
+      },
+      {
+        "name": "unique field ids",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "valid polygons",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "non-empty polygons",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "positive area",
+        "status": "pass",
+        "expected": "30",
+        "observed": "30"
+      },
+      {
+        "name": "compactness in (0, 1]",
+        "status": "pass",
+        "expected": "0 < c <= 1",
+        "observed": "0.135-0.617"
+      },
+      {
+        "name": "computed area matches boundary attribute",
+        "status": "pass",
+        "expected": "<= 2% deviation",
+        "observed": "max 0.01%"
+      },
+      {
+        "name": "CDL pixel area matches polygon",
+        "status": "pass",
+        "expected": "<= 2% deviation",
+        "observed": "max 0.86%"
+      },
+      {
+        "name": "CDL area available for every field",
+        "status": "pass",
+        "expected": "0",
+        "observed": "0"
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "path": "figures/b1_field_map_and_acreage.png",
+      "bytes": 203522,
+      "sha256": "46ffd127400c15d3252572a932119a0edbd6b5c9b4f7a0181bf006fd0b252749"
+    },
+    {
+      "path": "figures/b2_area_vs_compactness.png",
+      "bytes": 144511,
+      "sha256": "b0fb7662f71e2b20dbb6e1fa98c64d4c60e077340c18f22b6c036c169a2c014b"
+    },
+    {
+      "path": "figures/b3_polygon_vs_cdl_area.png",
+      "bytes": 169823,
+      "sha256": "24952d93fbc3111ab83256facb6d824c61a67a0900f3e90427bc279a8f2e2b31"
+    },
+    {
+      "path": "figures/c1_crop_sequence_heatmap.png",
+      "bytes": 196243,
+      "sha256": "532748d642090a814fc303065f1cf2a2608bfbef28ea54ee232a145d2c904c22"
+    },
+    {
+      "path": "figures/c2_crop_mix_by_grower_year.png",
+      "bytes": 165011,
+      "sha256": "53a99435dc9a4f71185028ff4b43731da7264f4e097e1ac58607184cf8e54bd4"
+    },
+    {
+      "path": "figures/c3_transition_matrix.png",
+      "bytes": 177099,
+      "sha256": "6cc30ede92e8421905a915e6a3c8316f1b5ace413574b810c2a45a96cca1a859"
+    },
+    {
+      "path": "figures/w1_within_field_precip_anomaly.png",
+      "bytes": 259725,
+      "sha256": "f7e2d26940f4999744fb4dd9036854172656dfb50c6572caf387e9c659f36611"
+    },
+    {
+      "path": "figures/w2_climate_space.png",
+      "bytes": 244901,
+      "sha256": "f504f09c490a4ecdea0b7d59bf59c59ba5adab595efb1b6acac281420aa481b9"
+    },
+    {
+      "path": "figures/w3_crop_weather_exposure.png",
+      "bytes": 255643,
+      "sha256": "826ec883c4e7a8e9d802cd223d6e1cafd84101319776afa994de0f4d49ae11c0"
+    },
+    {
+      "path": "tables/cdl_field_year.csv",
+      "bytes": 25383,
+      "sha256": "435434747db39ce0b2d934b26777d31f0909463ad4f03b958e410f151df4731b"
+    },
+    {
+      "path": "tables/crop_weather.csv",
+      "bytes": 12923,
+      "sha256": "6401762375da32fe02f17204d4dfbcdcbbf60879babdbd9b27acdbb1185c181c"
+    },
+    {
+      "path": "tables/field_summary.csv",
+      "bytes": 3884,
+      "sha256": "143f01611b71ca3273704e4b663652f0a7874277b928ac9d83ce881ee3eb8055"
+    },
+    {
+      "path": "tables/grower_profile.csv",
+      "bytes": 946,
+      "sha256": "6fa7cb677ba12a28884a1936d73184ee043a2ac44f1818a1c4366a5beccc7d25"
+    },
+    {
+      "path": "tables/rotation_summary.csv",
+      "bytes": 3554,
+      "sha256": "13fd3ee7f31650d88c642a33d9fa6cc85d2e1b291d9ac9267a874073c2961590"
+    },
+    {
+      "path": "tables/weather_cell_year.csv",
+      "bytes": 6491,
+      "sha256": "069847aa5c1b7efdb7d3c6e8a16b9eaed42adafdb0625f1285300884a838dbfc"
+    },
+    {
+      "path": "tables/weather_field_year.csv",
+      "bytes": 32008,
+      "sha256": "043a834e1ab0d90248b8859c615c0d8c1c495bf17708d6170d2bbe02cb8bafb1"
+    },
+    {
+      "path": "tables/weather_qc.csv",
+      "bytes": 9265,
+      "sha256": "87ed9cb939e30ecddeb5304cff7d94b356dbffa64b4a83db579b82bbcfe1c062"
+    },
+    {
+      "path": "tables/weather_sensitivity.csv",
+      "bytes": 843,
+      "sha256": "4509eee753ec9799403df853ec8ff374322f2b46005d1b09603798e7887b7abd"
+    }
+  ],
+  "caveats": [
+    "Fields are the largest CSB blocks per county, not a random sample; treat group differences as descriptions of these three cases.",
+    "Weather is sampled on a small number of grid cells. Fields sharing a cell have identical daily series, so field counts overstate independent weather samples.",
+    "Season-definition sensitivity is reported in weather_sensitivity.csv; a precipitation ranking may change between May-Sep and Apr-Oct.",
+    "CDL composition includes non-crop classes so shares sum to about 100%; crop-only share must be computed by filtering, not from a residual.",
+    "Crop-weather differences pair corn years with soybean years on the same field, so they also carry year-to-year weather; they are not a crop effect.",
+    "No yield data is used. Weather exposure is not yield, and no yield claim is made.",
+    "Crop transitions describe observed CDL history only. No next-crop prediction is made.",
+    "No p-values or causal claims. Co-occurrence is not causation."
+  ]
+}

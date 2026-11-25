@@ -22,6 +22,9 @@ Usage:
   export DATA_PIPELINE_DATA_ROOT=... AG_GROWER_SLUG=... AG_FARM_SLUG=...
   python download_csb_fields.py --bbox S W N E --min-area-ha 40 \
       --field-prefix ia-r --max-fields 3
+  python download_csb_fields.py --bbox S W N E --field-prefix ne-r \
+      --max-fields 10 --state NE --state-fips 31 \
+      --county-name York --county-fips 185
 """
 from __future__ import annotations
 
@@ -48,6 +51,11 @@ URL = "https://data.source.coop/fiboa/us-usda-cropland/us_usda_cropland.parquet"
 LEAF = {"bbox.xmin": 7, "bbox.ymin": 8, "bbox.xmax": 9, "bbox.ymax": 10}
 
 
+def _normalize_county_name(name: str) -> str:
+    cleaned = str(name).strip().lower().replace(" county", "")
+    return " ".join(cleaned.split())
+
+
 def file_crs(pf: pq.ParquetFile) -> CRS:
     kv = {
         (k.decode() if isinstance(k, bytes) else k): (
@@ -67,6 +75,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--field-prefix", required=True)
     ap.add_argument("--country", default="US")
     ap.add_argument("--state", default="")
+    ap.add_argument(
+        "--state-fips",
+        default="",
+        help="Two-digit state FIPS written onto each field (needed for CDL routing).",
+    )
+    ap.add_argument(
+        "--county-name",
+        default="",
+        help="Keep only fields whose CSB county matches this name (e.g. York).",
+    )
+    ap.add_argument(
+        "--county-fips",
+        default="",
+        help="Three-digit county FIPS written onto each field.",
+    )
     ap.add_argument("--year", default="")
     args = ap.parse_args(argv)
 
@@ -101,6 +124,7 @@ def main(argv: list[str] | None = None) -> int:
             sel.append(i)
 
     rows = []
+    target_county = _normalize_county_name(args.county_name) if args.county_name else ""
     for i in sel:
         d = pf.read_row_group(
             i, columns=["id", "crop:name", "administrative_area_level_2", "geometry"]
@@ -109,6 +133,8 @@ def main(argv: list[str] | None = None) -> int:
             d["id"], d["crop:name"], d["administrative_area_level_2"], d["geometry"]
         ):
             if geom is None:
+                continue
+            if target_county and _normalize_county_name(county) != target_county:
                 continue
             poly = wkb.loads(geom)
             bb = poly.bounds
@@ -129,22 +155,24 @@ def main(argv: list[str] | None = None) -> int:
         slug = f"{args.field_prefix}{i + 1}"
         fdir = farm_dir / "fields" / slug
         (fdir / "boundary").mkdir(parents=True, exist_ok=True)
+        properties = {
+            "field_id": slug,
+            "country": args.country,
+            "state": args.state,
+            "year": args.year,
+            "area_ha_est": round(ha, 1),
+            "crop": crop,
+            "area_acres": round(ha * 2.47105, 1),
+            "source": "usda_csb_fiboa",
+            "csb_id": str(fid),
+            "county": county,
+        }
+        if args.state_fips:
+            properties["state_fips"] = str(args.state_fips).zfill(2)
+        if args.county_fips:
+            properties["county_fips"] = str(args.county_fips).zfill(3)
         gdf = gpd.GeoDataFrame(
-            [
-                {
-                    "field_id": slug,
-                    "country": args.country,
-                    "state": args.state,
-                    "year": args.year,
-                    "area_ha_est": round(ha, 1),
-                    "crop": crop,
-                    "area_acres": round(ha * 2.47105, 1),
-                    "source": "usda_csb_fiboa",
-                    "csb_id": str(fid),
-                    "county": county,
-                    "geometry": poly,
-                }
-            ],
+            [dict(properties, geometry=poly)],
             crs=crs,
         ).to_crs("EPSG:4326")
         gdf.to_file(fdir / "boundary" / "field_boundary.geojson", driver="GeoJSON")
@@ -173,6 +201,9 @@ def main(argv: list[str] | None = None) -> int:
         "license": "CC-BY-4.0 (FIBOA); USDA public (CSB)",
         "file_crs": crs.name,
         "bbox": args.bbox,
+        "county_filter": args.county_name or None,
+        "state_fips": str(args.state_fips).zfill(2) if args.state_fips else None,
+        "county_fips": str(args.county_fips).zfill(3) if args.county_fips else None,
         "row_groups_read": len(sel),
         "total_row_groups": pf.metadata.num_row_groups,
         "min_area_ha": args.min_area_ha,
